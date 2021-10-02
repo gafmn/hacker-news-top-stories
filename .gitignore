@@ -12,3 +12,5 @@ celerybeat-schedule
 
 # vim
 *.swp
+
+logs/
