@@ -1,4 +1,5 @@
-from typing import List
+from functools import total_ordering
+from typing import Generator, List
 import logging
 import sys
 
@@ -21,21 +22,30 @@ logging.info(sys.path)
 )
 def hacker_news():
     @task()
-    def fetch_data() -> List[int]:
-        result = get_beststories()
-        return result[:150]
+    def fetch_story_ids() -> List[int]:
+        story_ids = get_beststories()
+        return story_ids
 
     @task()
-    def parse_data():
-        print('Lol')
+    def fetch_stories_data(**context) -> List[dict]:
+        to_save = list()
+        ti = context['ti']
+        data = ti.xcom_pull(task_ids='fetch_story_ids')
+
+        stories_generator = fetch_story_data(data)
+
+        for item in stories_generator:
+            to_save.append(item)
+
+        return to_save
 
     @task()
     def save_data():
-        print('meow')
+        pass
 
 
-    task1 = fetch_data()
-    task2 = parse_data()
+    task1 = fetch_story_ids()
+    task2 = fetch_stories_data()
     task3 = save_data()
 
     task1 >> task2 >> task3     # type: ignore
