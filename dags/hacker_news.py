@@ -5,10 +5,10 @@ import logging.config
 from airflow.decorators import dag, task    # type: ignore
 from airflow.utils.dates import days_ago    # type: ignore
 
-from src.api_service import (
+from src.api_service import (   # type: ignore
         get_beststories,
         fetch_story_data
-        )   # type: ignore
+        ) 
 from src.parse_data import build_stories_info   # type: ignore
 
 logger = logging.getLogger('hackerNews')

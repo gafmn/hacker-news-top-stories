@@ -1,16 +1,16 @@
 import json
 import logging
-from typing import Generator, Union, List, Dict
+from typing import Generator, Union, List, Dict, Any
 from datetime import datetime
 
 logger = logging.getLogger('parseStoriesInfo')
 
 def build_stories_info(stories_generator: Generator[dict, None, None]) -> str:
     logger.info('Parse stories data')
-    stories_info: Dict[str, Union[datetime, List[dict]]] = dict()
+    stories_info: Dict[str, Any] = dict()
 
     now = datetime.now()    
-    stories_info['date'] = now
+    stories_info['date'] = str(now)
 
     stories_info['articles'] = list()
 
