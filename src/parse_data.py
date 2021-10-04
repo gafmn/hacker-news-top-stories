@@ -1,10 +1,10 @@
 import json
-from typing import Generator
+from typing import Generator, Union, List, Dict
 from datetime import datetime
 
 
 def build_stories_info(stories_generator: Generator[dict, None, None]) -> str:
-    stories_info = dict()
+    stories_info: Dict[str, Union[datetime, List[dict]]] = dict()
 
     now = datetime.now()    
     stories_info['date'] = now

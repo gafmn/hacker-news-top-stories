@@ -8,8 +8,8 @@ from airflow.utils.dates import days_ago    # type: ignore
 from src.api_service import (
         get_beststories,
         fetch_story_data
-)
-from src.parse_data import build_stories_info
+        )   # type: ignore
+from src.parse_data import build_stories_info   # type: ignore
 
 DEFAULT_ARGS = {'owner': 'airflow'}
 logging.info(sys.path)
