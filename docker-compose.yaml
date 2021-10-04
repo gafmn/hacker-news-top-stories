@@ -94,3 +94,7 @@ services:
 volumes:
   postgres-db-volume:
 
+networks:
+  default:
+    external:
+      name: hacker-news-network

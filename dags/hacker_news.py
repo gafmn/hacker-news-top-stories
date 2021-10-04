@@ -1,5 +1,4 @@
-from functools import total_ordering
-from typing import Generator, List
+from typing import List
 import logging
 import sys
 
@@ -10,6 +9,7 @@ from src.api_service import (
         get_beststories,
         fetch_story_data
 )
+from src.parse_data import build_stories_info
 
 DEFAULT_ARGS = {'owner': 'airflow'}
 logging.info(sys.path)
@@ -27,17 +27,15 @@ def hacker_news():
         return story_ids
 
     @task()
-    def fetch_stories_data(**context) -> List[dict]:
-        to_save = list()
+    def process_stories_data(**context) -> str:
         ti = context['ti']
         data = ti.xcom_pull(task_ids='fetch_story_ids')
 
         stories_generator = fetch_story_data(data)
 
-        for item in stories_generator:
-            to_save.append(item)
+        stories_info = build_stories_info(stories_generator)
 
-        return to_save
+        return stories_info
 
     @task()
     def save_data():
@@ -45,7 +43,7 @@ def hacker_news():
 
 
     task1 = fetch_story_ids()
-    task2 = fetch_stories_data()
+    task2 = process_stories_data()
     task3 = save_data()
 
     task1 >> task2 >> task3     # type: ignore
