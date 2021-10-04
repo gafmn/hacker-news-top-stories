@@ -11,13 +11,15 @@ from src.api_service import (
         )   # type: ignore
 from src.parse_data import build_stories_info   # type: ignore
 
-DEFAULT_ARGS = {'owner': 'airflow'}
+DEFAULT_ARGS = {
+    'owner': 'airflow',
+    'schedule_interval': '@hourly'
+}
 logging.info(sys.path)
 
 @dag(
     dag_id='hacker_news',
     default_args=DEFAULT_ARGS,
-    schedule_interval=None, 
     start_date=days_ago(2)
 )
 def hacker_news():
