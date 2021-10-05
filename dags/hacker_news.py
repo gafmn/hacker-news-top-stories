@@ -54,7 +54,7 @@ def hacker_news():
         return story_ids
 
     @task()
-    def process_stories_data(**context) -> str:
+    def process_stories_ids(**context) -> str:
         logger.info('Load data from xCom')
         ti = context['ti']
         data = ti.xcom_pull(task_ids='fetch_story_ids')
@@ -72,7 +72,7 @@ def hacker_news():
 
 
     task1 = fetch_story_ids()
-    task2 = process_stories_data()
+    task2 = process_stories_ids()
     task3 = save_data()
 
     task1 >> task2 >> task3     # type: ignore

@@ -11,7 +11,7 @@ def get_beststories() -> List[int]:
     return result
 
 
-def fetch_story_data(story_ids) -> Generator[dict, None, None]:
+def fetch_story_data(story_ids: List[int]) -> Generator[dict, None, None]:
     for story_id in story_ids:
         response = requests.get(HACKER_NEWS_URL + f'item/{story_id}.json')
         yield response.json()
