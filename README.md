@@ -13,3 +13,7 @@ Docker and docker-compose
 ```
 docker-compose up -d --build
 ```
+
+Airflow running on 8080 port
+
+[Check here](localhost:8080)
