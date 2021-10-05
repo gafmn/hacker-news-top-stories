@@ -1,14 +1,15 @@
-from typing import List
 import logging
 import logging.config
+from typing import List
+from datetime import datetime
 
 from airflow.decorators import dag, task    # type: ignore
 from airflow.utils.dates import days_ago    # type: ignore
 
 from src.api_service import (   # type: ignore
-        get_beststories,
-        fetch_story_data
-        ) 
+    get_beststories,
+    fetch_story_data
+) 
 from src.parse_data import build_stories_info   # type: ignore
 
 logger = logging.getLogger('hackerNews')
@@ -42,7 +43,7 @@ DEFAULT_ARGS = {
 @dag(
     dag_id='hacker_news',
     default_args=DEFAULT_ARGS,
-    start_date=days_ago(2)
+    start_date=days_ago(1)
 )
 def hacker_news():
     @task()
@@ -54,14 +55,16 @@ def hacker_news():
         return story_ids
 
     @task()
-    def process_stories_ids(**context) -> str:
+    def process_stories_ids(date: str, **context) -> str:
         logger.info('Load data from xCom')
         ti = context['ti']
         data = ti.xcom_pull(task_ids='fetch_story_ids')
 
+        execution_date = date
+
         logger.info('Generate stories data')
         stories_generator = fetch_story_data(data)
-        stories_info = build_stories_info(stories_generator)
+        stories_info = build_stories_info(stories_generator, execution_date)
 
         return stories_info
 
@@ -72,7 +75,10 @@ def hacker_news():
 
 
     task1 = fetch_story_ids()
-    task2 = process_stories_ids()
+
+    date = "{{ ts }}"
+    task2 = process_stories_ids(date)
+
     task3 = save_data()
 
     task1 >> task2 >> task3     # type: ignore

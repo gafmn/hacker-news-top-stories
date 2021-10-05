@@ -5,12 +5,11 @@ from datetime import datetime
 
 logger = logging.getLogger('parseStoriesInfo')
 
-def build_stories_info(stories_generator: Generator[dict, None, None]) -> str:
+def build_stories_info(stories_generator: Generator[dict, None, None], execution_date: str) -> str:
     logger.info('Parse stories data')
     stories_info: Dict[str, Any] = dict()
 
-    now = datetime.now()    
-    stories_info['date'] = str(now)
+    stories_info['execution_date'] = execution_date
 
     stories_info['articles'] = list()
 
