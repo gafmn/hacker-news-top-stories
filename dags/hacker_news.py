@@ -37,7 +37,7 @@ logging.config.dictConfig(
 
 DEFAULT_ARGS = {
     'owner': 'airflow',
-    'schedule_interval': None
+    'schedule_interval': '@hourly'
 }
 
 @dag(
