@@ -14,6 +14,7 @@ from src.parse_data import build_stories_info   # type: ignore
 
 logger = logging.getLogger('hackerNews')
 
+# Logger setup
 logging.config.dictConfig(
     {
         'version': 1,
@@ -48,6 +49,9 @@ DEFAULT_ARGS = {
 def hacker_news():
     @task()
     def fetch_story_ids() -> List[int]:
+        """
+        Get stories ids for processing
+        """
         logger.info('Get best stories from hacker news API')
 
         story_ids = get_beststories()
@@ -56,6 +60,9 @@ def hacker_news():
 
     @task()
     def process_stories_ids(date: str, **context) -> str:
+        """
+        Get stories details and format it ro string
+        """
         logger.info('Load data from xCom')
         ti = context['ti']
         data = ti.xcom_pull(task_ids='fetch_story_ids')
@@ -70,14 +77,17 @@ def hacker_news():
 
     @task()
     def save_data():
+        """
+        Save processed data to storage server
+        """
         logger.info('Save stories data to minio')
         pass
 
 
     task1 = fetch_story_ids()
 
-    date = "{{ ts }}"
-    task2 = process_stories_ids(date)
+    execution_date = "{{ ts }}"
+    task2 = process_stories_ids(execution_date)
 
     task3 = save_data()
 

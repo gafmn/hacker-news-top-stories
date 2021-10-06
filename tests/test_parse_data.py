@@ -17,6 +17,9 @@ from src.parse_data import build_stories_info   # type: ignore
 
 
 def generate_stub_stories() -> Generator[dict, None, None]:
+    """
+    Stub stories data
+    """
     for i in range(2):
         stub_data = {
                 'title': 'Test' + str(i),
@@ -27,6 +30,9 @@ def generate_stub_stories() -> Generator[dict, None, None]:
 
 
 def generate_stub_stories_without_url() -> Generator[dict, None, None]:
+    """
+    Stub stories data without providing url
+    """
     for i in range(2):
         stub_data = {
                 'title': 'Test' + str(i),
@@ -37,6 +43,9 @@ def generate_stub_stories_without_url() -> Generator[dict, None, None]:
 
 
 def test_build_stories_info():
+    """
+    Test module that extract necessary stories data and dumps it to string
+    """
     
     execution_date = str(datetime.now())
     generator_stories = generate_stub_stories()
@@ -65,6 +74,9 @@ def test_build_stories_info():
 
 
 def test_build_stories_info_without_url():
+    """
+    Test module that extract necessary stories data without providing url
+    """
     
     execution_date = str(datetime.now())
     generator_stories = generate_stub_stories_without_url()

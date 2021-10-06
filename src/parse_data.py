@@ -6,6 +6,9 @@ from datetime import datetime
 logger = logging.getLogger('parseStoriesInfo')
 
 def build_stories_info(stories_generator: Generator[dict, None, None], execution_date: str) -> str:
+    """
+    Parse generated stories data and save neccessary inforamtion to string
+    """
     logger.info('Parse stories data')
     stories_info: Dict[str, Any] = dict()
 
