@@ -1,20 +1,9 @@
 from typing import Generator
 from datetime import datetime
 import json
-import os
-import inspect
-import sys
 
-currentdir = os.path.dirname(   # type: ignore
-    os.path.abspath(
-        inspect.getfile(inspect.currentframe())     # type: ignore
-    )
-)
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir) 
-
-from src.parse_data import build_stories_info   # type: ignore
-
+from context import src
+from src import parse_data
 
 def generate_stub_stories() -> Generator[dict, None, None]:
     """
@@ -50,7 +39,7 @@ def test_build_stories_info():
     execution_date = str(datetime.now())
     generator_stories = generate_stub_stories()
 
-    res = build_stories_info(generator_stories, execution_date)
+    res = parse_data.build_stories_info(generator_stories, execution_date)
 
     expected_res = {
             'execution_date': execution_date,
@@ -81,7 +70,7 @@ def test_build_stories_info_without_url():
     execution_date = str(datetime.now())
     generator_stories = generate_stub_stories_without_url()
 
-    res = build_stories_info(generator_stories, execution_date)
+    res = parse_data.build_stories_info(generator_stories, execution_date)
 
     expected_res = {
             'execution_date': execution_date,
