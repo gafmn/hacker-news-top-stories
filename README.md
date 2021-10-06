@@ -17,3 +17,11 @@ docker-compose up -d --build
 Airflow running on 8080 port
 
 Check on `localhost:8080`
+
+ ## How to run test
+ 
+ Make sure that `pytest` is installed in your environment
+ 
+ ```
+ pytest tests
+ ```
