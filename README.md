@@ -16,4 +16,4 @@ docker-compose up -d --build
 
 Airflow running on 8080 port
 
-[Check here](localhost:8080)
+Check on `localhost:8080`
