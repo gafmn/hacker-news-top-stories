@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 
 from context import src
-from src import parse_data
+from src import parse_data  # type: ignore
 
 def generate_stub_stories() -> Generator[dict, None, None]:
     """
