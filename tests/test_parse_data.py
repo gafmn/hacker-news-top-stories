@@ -22,13 +22,22 @@ def generate_stub_stories() -> Generator[dict, None, None]:
         yield stub_data
 
 
+def generate_stub_stories_without_url() -> Generator[dict, None, None]:
+    for i in range(2):
+        stub_data = {
+                'title': 'Test' + str(i),
+                'score': 1234,
+                'url': 'there is no link'
+        }
+        yield stub_data
+
+
 def test_build_stories_info():
     
     execution_date = str(datetime.now())
     generator_stories = generate_stub_stories()
 
     res = build_stories_info(generator_stories, execution_date)
-    print(res)
 
     expected_res = {
             'execution_date': execution_date,
@@ -42,6 +51,34 @@ def test_build_stories_info():
                     'rating': 1234,
                     'name': 'Test1',
                     'link': 'some-url-here'
+                }
+            ]
+    }
+
+    expected_res = json.dumps(expected_res, default=str)
+
+    assert expected_res == res
+
+
+def test_build_stories_info_without_url():
+    
+    execution_date = str(datetime.now())
+    generator_stories = generate_stub_stories_without_url()
+
+    res = build_stories_info(generator_stories, execution_date)
+
+    expected_res = {
+            'execution_date': execution_date,
+            'articles': [
+                {
+                    'rating': 1234,
+                    'name': 'Test0',
+                    'link': 'there is no link'
+                },
+                {
+                    'rating': 1234,
+                    'name': 'Test1',
+                    'link': 'there is no link'
                 }
             ]
     }
