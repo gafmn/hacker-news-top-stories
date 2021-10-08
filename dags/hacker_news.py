@@ -1,7 +1,6 @@
 import logging
 import logging.config
 from typing import List
-from datetime import datetime
 
 from airflow.decorators import dag, task    # type: ignore
 from airflow.utils.dates import days_ago    # type: ignore
@@ -13,6 +12,7 @@ from src.api_service import (   # type: ignore
 from src.parse_data import build_stories_info   # type: ignore
 
 logger = logging.getLogger('hackerNews')
+FILENAME = 'top.json'
 
 # Logger setup
 logging.config.dictConfig(
@@ -76,13 +76,71 @@ def hacker_news():
         return stories_info
 
     @task()
-    def save_data():
+    def save_data(**context):
         """
         Save processed data to storage server
         """
-        logger.info('Save stories data to minio')
-        pass
+        import io
 
+        from minio import Minio
+
+        logger.info('Save stories data to minio')
+
+        logger.info('Load data from xCom')
+        ti = context['ti']
+        stories_info = ti.xcom_pull(task_ids='process_stories_ids')
+
+        client = Minio(
+            endpoint='minio:9000',
+            access_key='admin',
+            secret_key='password',
+            secure=False
+        )
+
+        logger.info('Check if backet already exist...')
+        if client.bucket_exists('stage'):
+            logger.info('Backet alredy exist')
+        else:
+            client.make_bucket('stage')
+
+        logger.info('Prepare object to save to Minio')
+
+        execution_date = context.get('execution_date')
+        object_name = f'articles/ycombinator/top/{execution_date}/top.json'
+
+        logger.info('Convert stories info to stream of bytes')
+        stories_info_bytes = bytes(stories_info, 'utf-8')
+        logger.info(stories_info_bytes)
+        stories_info_stream = io.BytesIO(stories_info_bytes)
+        logger.info(stories_info_stream)
+
+
+        logger.info(f'Put stories info to bucket with key {object_name}')
+        client.put_object(
+            bucket_name='stage',
+            data=stories_info_stream,
+            object_name=object_name,
+            length=len(stories_info_bytes),
+        )
+
+    @task
+    def test_write():
+        import io
+
+        from minio import Minio
+        client = Minio(
+            endpoint='minio:9000',
+            access_key='admin',
+            secret_key='password',
+            secure=False
+        )
+        result = client.put_object(
+            "stage", "my-object", io.BytesIO(b"hello"), 5,
+        )
+        logger.info(result)
+
+
+    # test_write()
 
     task1 = fetch_story_ids()
 
