@@ -14,6 +14,7 @@ from src.parse_data import build_stories_info   # type: ignore
 
 logger = logging.getLogger('airflow.task')
 logger.setLevel(logging.INFO)
+
 FILENAME = 'top.json'
 
 DEFAULT_ARGS = {
@@ -64,7 +65,7 @@ def hacker_news():
         """
         import io
 
-        from minio import Minio
+        from minio import Minio     # type: ignore
 
         logger.info('Save stories data to minio')
 
@@ -109,24 +110,6 @@ def hacker_news():
             length=len(stories_info_bytes),
         )
 
-    @task
-    def test_write():
-        import io
-
-        from minio import Minio
-        client = Minio(
-            endpoint='minio:9000',
-            access_key='admin',
-            secret_key='password',
-            secure=False
-        )
-        result = client.put_object(
-            "stage", "my-object", io.BytesIO(b"hello"), 5,
-        )
-        logger.info(result)
-
-
-    # test_write()
 
     task1 = fetch_story_ids()
 
