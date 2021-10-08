@@ -11,33 +11,13 @@ from src.api_service import (   # type: ignore
 ) 
 from src.parse_data import build_stories_info   # type: ignore
 
+
 logger = logging.getLogger('hackerNews')
 FILENAME = 'top.json'
 
-# Logger setup
-logging.config.dictConfig(
-    {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'console': {
-                'level': 'INFO',
-                'class': 'logging.StreamHandler'
-            }
-        },
-        'loggers': {
-            'hackerNews': {
-                'handlers': ['console']
-            },
-            'parseStoriesInfo': {
-                'handlers': ['console']
-            }
-        }
-    }
-)
-
 DEFAULT_ARGS = {
     'owner': 'airflow',
+    'provide_context': False,
     'schedule_interval': '@hourly'
 }
 
@@ -59,7 +39,7 @@ def hacker_news():
         return story_ids
 
     @task()
-    def process_stories_ids(date: str, **context) -> str:
+    def process_stories_ids(**context) -> str:
         """
         Get stories details and format it ro string
         """
@@ -67,7 +47,8 @@ def hacker_news():
         ti = context['ti']
         data = ti.xcom_pull(task_ids='fetch_story_ids')
 
-        execution_date = date
+        execution_date = context['ts_nodash']
+        logger.info(execution_date)
 
         logger.info('Generate stories data')
         stories_generator = fetch_story_data(data)
@@ -105,8 +86,12 @@ def hacker_news():
 
         logger.info('Prepare object to save to Minio')
 
-        execution_date = context.get('execution_date')
+        execution_date = context['ts_nodash']
+
+        logger.info(execution_date)
         object_name = f'articles/ycombinator/top/{execution_date}/top.json'
+
+        logger.info(stories_info)
 
         logger.info('Convert stories info to stream of bytes')
         stories_info_bytes = bytes(stories_info, 'utf-8')
@@ -144,8 +129,7 @@ def hacker_news():
 
     task1 = fetch_story_ids()
 
-    execution_date = "{{ ts }}"
-    task2 = process_stories_ids(execution_date)
+    task2 = process_stories_ids()
 
     task3 = save_data()
 

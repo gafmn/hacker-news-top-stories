@@ -4,6 +4,7 @@ from typing import Generator, Dict, Any
 
 logger = logging.getLogger('parseStoriesInfo')
 
+
 def build_stories_info(
         stories_generator: Generator[dict, None, None],
         execution_date: str
