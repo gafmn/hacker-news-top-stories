@@ -2,7 +2,7 @@ import json
 import logging
 from typing import Generator, Dict, Any
 
-logger = logging.getLogger('parseStoriesInfo')
+logger = logging.getLogger('airflow.task')
 
 
 def build_stories_info(

@@ -12,7 +12,8 @@ from src.api_service import (   # type: ignore
 from src.parse_data import build_stories_info   # type: ignore
 
 
-logger = logging.getLogger('hackerNews')
+logger = logging.getLogger('airflow.task')
+logger.setLevel(logging.INFO)
 FILENAME = 'top.json'
 
 DEFAULT_ARGS = {
