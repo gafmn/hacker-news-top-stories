@@ -8,6 +8,43 @@ For convenience [API of Hacker News](https://github.com/HackerNews/API) was used
 
 Docker and docker-compose
 
+## Setup environment
+
+Create file `.env` in root of project
+
+Default setup for project
+```
+BUCKET_MINIO_PATH=articles/ycombinator/top/  # key for stories info in bucket
+BUCKET_MINIO_FILENAME=top.json  # filename in bucket with stories info
+BUCKET_MINIO_NAME=stage  # name of bucket
+MINIO_DATA=/mnt/data  # mount of minio data
+MINIO_USER=admin  # minio user
+MINIO_PASSWORD=password  # minio user's password
+MINIO_IS_SECURE=False  # is require ssl
+
+HACKER_NEWS_URL=https://hacker-news.firebaseio.com/v0/  # base url for fetching stories info
+
+# Airflow setup
+AIRFLOW_EXECUTOR=CeleryExecutor
+AIRFLOW_SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
+AIRFLOW_CELERY_RESULT_BACKEND=db+postgresql://airflow:airflow@postgres/airflow
+AIRFLOW_CELERY_BROKER_URL=redis://:@redis:6379/0
+AIRFLOW_FERNET_KEY=
+AIRFLOW_DAGS_ARE_PAUSED_AT_CREATION=True
+AIRFLOW_LOAD_EXAMPLES=False
+
+AIRFLOW_DAGS_PATH=./dags  # path to dags in local machine
+AIRFLOW_LOGS_PATH=./logs  # path to logs in local machine
+AIRFLOW_USER=airflow  # airflow user
+AIRFLOW_PASSWORD=airflow  # airflow user's password
+
+# Postgres setup
+POSTGRES_USER=airflow
+POSTGRES_PASSWORD=airflow
+POSTGRES_DB=airflow
+
+```
+
 ## How to run project
 
 ```
