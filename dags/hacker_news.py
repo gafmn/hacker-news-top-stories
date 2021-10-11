@@ -100,7 +100,7 @@ def hacker_news():
         execution_date = context['ts_nodash']
 
         logger.info(execution_date)
-        object_name = BUCKET_PATH + (execution_date) + '/' + FILENAME
+        object_name = f'{BUCKET_PATH}{execution_date}/{FILENAME}'
 
         logger.info(object_name)
 
