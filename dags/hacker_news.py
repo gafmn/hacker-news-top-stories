@@ -1,6 +1,7 @@
 import logging
 import logging.config
 from typing import List
+import os
 
 from airflow.decorators import dag, task    # type: ignore
 from airflow.utils.dates import days_ago    # type: ignore
@@ -15,7 +16,9 @@ from src.parse_data import build_stories_info   # type: ignore
 logger = logging.getLogger('airflow.task')
 logger.setLevel(logging.INFO)
 
-FILENAME = 'top.json'
+FILENAME = os.environ.get('BUCKET_MINIO_FILENAME', '')
+BUCKET_PATH = os.environ.get('BUCKET_MINIO_PATH', '')
+BUCKET_NAME = os.environ.get('BUCKET_MINIO_NAME', '')
 
 DEFAULT_ARGS = {
     'owner': 'airflow',
@@ -67,33 +70,38 @@ def hacker_news():
 
         from minio import Minio     # type: ignore
 
+        global FILENAME
+        global BUCKET_PATH
+        global BUCKET_NAME
+
         logger.info('Save stories data to minio')
 
         logger.info('Load data from xCom')
         ti = context['ti']
         stories_info = ti.xcom_pull(task_ids='process_stories_ids')
+        logger.info(os.environ.get('MINIO_SECURE'))
 
         client = Minio(
             endpoint='minio:9000',
-            access_key='admin',
-            secret_key='password',
-            secure=False
+            access_key=os.environ.get('MINIO_USER'),
+            secret_key=os.environ.get('MINIO_PASSWORD'),
+            secure=os.environ.get('MINIO_SECURE', 'False').lower() in ('true')
         )
 
         logger.info('Check if backet already exist...')
-        if client.bucket_exists('stage'):
+        if client.bucket_exists(BUCKET_NAME):
             logger.info('Backet alredy exist')
         else:
-            client.make_bucket('stage')
+            client.make_bucket(BUCKET_NAME)
 
         logger.info('Prepare object to save to Minio')
 
         execution_date = context['ts_nodash']
 
         logger.info(execution_date)
-        object_name = f'articles/ycombinator/top/{execution_date}/top.json'
+        object_name = BUCKET_PATH + (execution_date) + '/' + FILENAME
 
-        logger.info(stories_info)
+        logger.info(object_name)
 
         logger.info('Convert stories info to stream of bytes')
         stories_info_bytes = bytes(stories_info, 'utf-8')
@@ -104,7 +112,7 @@ def hacker_news():
 
         logger.info(f'Put stories info to bucket with key {object_name}')
         client.put_object(
-            bucket_name='stage',
+            bucket_name=BUCKET_NAME,
             data=stories_info_stream,
             object_name=object_name,
             length=len(stories_info_bytes),
