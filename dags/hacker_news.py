@@ -23,12 +23,13 @@ BUCKET_NAME = os.environ.get('BUCKET_MINIO_NAME', '')
 DEFAULT_ARGS = {
     'owner': 'airflow',
     'provide_context': False,
-    'schedule_interval': '@hourly'
 }
 
 @dag(
     dag_id='hacker_news',
     default_args=DEFAULT_ARGS,
+    schedule_interval='@hourly',
+    catchup=False,
     start_date=days_ago(1)
 )
 def hacker_news():
