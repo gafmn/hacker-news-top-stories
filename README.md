@@ -46,6 +46,24 @@ POSTGRES_DB=airflow
 
 ```
 
+## Create connection in airflow
+Fill **fields**
+
+`Conn id`: `MINIO_CONN_NAME`
+
+`Host`: minio
+
+`Port`: 9000
+
+`Extra`: 
+```
+{
+  "aws_access_key_id": MINIO_USER, 
+  "aws_secret_access_key": MINIO_PASSWORD, 
+  "host": "http://minio:9000"
+}
+```
+
 ## How to run project
 
 ```
