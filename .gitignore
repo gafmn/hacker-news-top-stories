@@ -14,3 +14,6 @@ celerybeat-schedule
 *.swp
 
 logs/
+
+# Environament variables
+.env

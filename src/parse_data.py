@@ -1,11 +1,14 @@
 import json
 import logging
-from typing import Generator, Union, List, Dict, Any
-from datetime import datetime
+from typing import Generator, Dict, Any
 
-logger = logging.getLogger('parseStoriesInfo')
+logger = logging.getLogger('airflow.task')
 
-def build_stories_info(stories_generator: Generator[dict, None, None], execution_date: str) -> str:
+
+def build_stories_info(
+        stories_generator: Generator[dict, None, None],
+        execution_date: str
+) -> str:
     """
     Parse generated stories data and save neccessary inforamtion to string
     """
