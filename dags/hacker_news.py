@@ -5,6 +5,7 @@ import os
 
 from airflow.decorators import dag, task    # type: ignore
 from airflow.utils.dates import days_ago    # type: ignore
+from airflow.hooks.S3_hook import S3Hook    # type: ignore
 
 from src.api_service import (   # type: ignore
     get_beststories,
@@ -19,6 +20,9 @@ logger.setLevel(logging.INFO)
 FILENAME = os.environ.get('BUCKET_MINIO_FILENAME', '')
 BUCKET_PATH = os.environ.get('BUCKET_MINIO_PATH', '')
 BUCKET_NAME = os.environ.get('BUCKET_MINIO_NAME', '')
+IS_SECURE_CONN = os.environ.get('MINIO_IS_SECURE', '').lower() in ('true')
+CONN_NAME = os.environ.get('MINIO_CONN_NAME')
+
 
 DEFAULT_ARGS = {
     'owner': 'airflow',
@@ -67,57 +71,36 @@ def hacker_news():
         """
         Save processed data to storage server
         """
-        import io
-
-        from minio import Minio     # type: ignore
-
         global FILENAME
         global BUCKET_PATH
         global BUCKET_NAME
-
-        logger.info('Save stories data to minio')
+        global IS_SECURE_CONN
+        global CONN_NAME
 
         logger.info('Load data from xCom')
         ti = context['ti']
         stories_info = ti.xcom_pull(task_ids='process_stories_ids')
-        logger.info(os.environ.get('MINIO_SECURE'))
-
-        client = Minio(
-            endpoint='minio:9000',
-            access_key=os.environ.get('MINIO_USER'),
-            secret_key=os.environ.get('MINIO_PASSWORD'),
-            secure=os.environ.get('MINIO_SECURE', 'False').lower() in ('true')
-        )
-
-        logger.info('Check if backet already exist...')
-        if client.bucket_exists(BUCKET_NAME):
-            logger.info('Backet alredy exist')
-        else:
-            client.make_bucket(BUCKET_NAME)
-
-        logger.info('Prepare object to save to Minio')
 
         execution_date = context['ts_nodash']
 
-        logger.info(execution_date)
-        object_name = f'{BUCKET_PATH}{execution_date}/{FILENAME}'
+        client = S3Hook(aws_conn_id=CONN_NAME, verify=IS_SECURE_CONN)
 
-        logger.info(object_name)
+        found = client.check_for_bucket(BUCKET_NAME)
+        if found:
+            logger.info(f'Bucket {BUCKET_NAME} alredy exist')
+        else:
+            logger.info(f'Bucket {BUCKET_NAME} not found')
+            client.create_bucket(BUCKET_NAME)
+            logger.info(f'Bucket {BUCKET_NAME} was created')
 
-        logger.info('Convert stories info to stream of bytes')
-        stories_info_bytes = bytes(stories_info, 'utf-8')
-        logger.info(stories_info_bytes)
-        stories_info_stream = io.BytesIO(stories_info_bytes)
-        logger.info(stories_info_stream)
-
-
-        logger.info(f'Put stories info to bucket with key {object_name}')
-        client.put_object(
-            bucket_name=BUCKET_NAME,
-            data=stories_info_stream,
-            object_name=object_name,
-            length=len(stories_info_bytes),
+        logger.info('Try to load stories information to storage...')
+        client.load_string(
+            string_data=stories_info,
+            key=f'{BUCKET_PATH}{execution_date}/{FILENAME}',
+            replace=True,
+            bucket_name=BUCKET_NAME
         )
+        logger.info('Data was successfully loaded')
 
 
     task1 = fetch_story_ids()
