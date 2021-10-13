@@ -4,6 +4,8 @@ Service saves every one hour top 10 best stories from Hacker News site.
 
 For convenience [API of Hacker News](https://github.com/HackerNews/API) was used.
 
+[![](https://img.shields.io/github/workflow/status/gafmn/hacker-news-top-stories/CheckTyping?logo=GitHub&style=for-the-badge)](https://github.com/gafmn/hacker-news-top-stories/actions/workflows/main.yml)
+
 ## Pre requirements
 
 Docker and docker-compose
