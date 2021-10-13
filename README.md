@@ -21,6 +21,7 @@ MINIO_DATA=/mnt/data  # mount of minio data
 MINIO_USER=admin  # minio user
 MINIO_PASSWORD=password  # minio user's password
 MINIO_IS_SECURE=False  # is require ssl
+MINIO_CONN_NAME=my_conn_S3 # airflow connection name
 
 HACKER_NEWS_URL=https://hacker-news.firebaseio.com/v0/  # base url for fetching stories info
 
