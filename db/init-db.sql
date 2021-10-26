@@ -1,0 +1,5 @@
+DROP DATABASE IF EXISTS hacker-news;
+
+CREATE DATABASE hacker-news;
+
+CREATE TABLE [IF NOT EXISTS] articles;

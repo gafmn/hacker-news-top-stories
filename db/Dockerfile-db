@@ -1,0 +1,7 @@
+FROM postgres:13
+
+COPY init-db.sql .
+
+COPY entrypoint.sh .
+
+ENTRYPOINT entrypoint.sh
