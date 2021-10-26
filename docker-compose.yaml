@@ -2,8 +2,8 @@ version: '3'
 x-airflow-common:
   &airflow-common
   build:
-    context: .
-    dockerfile: docker/Dockerfile-app
+    context: ./app
+    dockerfile: Dockerfile-app
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: ${AIRFLOW_EXECUTOR}
@@ -21,6 +21,9 @@ x-airflow-common:
     MINIO_CONN_NAME: ${MINIO_CONN_NAME}
     MINIO_SECURE: ${MINIO_IS_SECURE}
     HACKER_NEWS_URL: ${HACKER_NEWS_URL}
+    POSTGRES_HN_DB: ${POSTGRES_HN_DB}
+    POSTGRES_HN_USER: ${POSTGRES_HN_USER}
+    POSTGRES_HN_PASSWORD: ${POSTGRES_HN_PASSWORD}
   volumes:
     - ${AIRFLOW_DAGS_PATH}:/opt/airflow/dags
     - ${AIRFLOW_LOGS_PATH}:/opt/airflow/logs
@@ -34,14 +37,16 @@ x-airflow-common:
 services:
   postgres:
     build:
-      context: .
-      dockerfile: docker/Dockerfile-db
+      context: ./db
+      dockerfile: Dockerfile-db
     container_name: postgres
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_DB_HN: ${POSTGRES_DB_HN} 
+      POSTGRES_HN_DB: ${POSTGRES_HN_DB}
+      POSTGRES_HN_USER: ${POSTGRES_HN_USER}
+      POSTGRES_HN_PASSWORD: ${POSTGRES_HN_PASSWORD}
     ports:
       - 5432:5432
     volumes:
