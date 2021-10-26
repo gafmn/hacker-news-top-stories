@@ -19,6 +19,7 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_HN_USER" --dbname "$POSTGRES_HN_DB
       article_name varchar(50),
       link varchar(30),
       rating INT,
+      PRIMARY KEY(hash),
       CONSTRAINT fk_article
         FOREIGN KEY(article_name)
           REFERENCES h_articles(name)

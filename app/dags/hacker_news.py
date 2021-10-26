@@ -10,8 +10,9 @@ from airflow.hooks.S3_hook import S3Hook    # type: ignore
 from src.api_service import (   # type: ignore
     get_beststories,
     fetch_story_data
-) 
+)
 from src.parse_data import build_stories_info   # type: ignore
+from src.db_connector import establish_connection
 
 
 logger = logging.getLogger('airflow.task')
@@ -29,6 +30,7 @@ DEFAULT_ARGS = {
     'provide_context': False,
 }
 
+
 @dag(
     dag_id='hacker_news',
     default_args=DEFAULT_ARGS,
@@ -45,7 +47,7 @@ def hacker_news():
         logger.info('Get best stories from hacker news API')
 
         story_ids = get_beststories()
-        
+
         return story_ids
 
     @task()
@@ -65,6 +67,27 @@ def hacker_news():
         stories_info = build_stories_info(stories_generator, execution_date)
 
         return stories_info
+
+    @task()
+    def save_stories_data_vault(**context):
+        """
+        """
+        conn = establish_connection()
+        logger.info(conn)
+        logger.info(type(conn))
+
+        logger.info('Load data from xCom')
+        ti = context['ti']
+        data = ti.xcom_pull(task_ids='fetch_story_ids')
+        stories_generator = fetch_story_data(data)
+
+        cursor = conn.cursor()
+
+        query = """
+            """
+
+        for story_info in stories_generator:
+            pass
 
     @task()
     def save_data(**context):
@@ -102,14 +125,15 @@ def hacker_news():
         )
         logger.info('Data was successfully loaded')
 
+    task4 = save_stories_data_vault()
 
-    task1 = fetch_story_ids()
+    # task1 = fetch_story_ids()
 
-    task2 = process_stories_ids()
+    # task2 = process_stories_ids()
 
-    task3 = save_data()
+    # task3 = save_data()
 
-    task1 >> task2 >> task3     # type: ignore
+    # task1 >> task2 >> task3     # type: ignore
 
 
 dag = hacker_news()
