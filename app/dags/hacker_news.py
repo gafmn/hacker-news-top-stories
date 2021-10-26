@@ -76,6 +76,8 @@ def hacker_news():
         logger.info(conn)
         logger.info(type(conn))
 
+        execution_date = context['ts_nodash']
+
         logger.info('Load data from xCom')
         ti = context['ti']
         data = ti.xcom_pull(task_ids='fetch_story_ids')
@@ -83,11 +85,16 @@ def hacker_news():
 
         cursor = conn.cursor()
 
-        query = """
+        for story in stories_generator:
+            query = """
+                INSERT INTO h_articles (name, created_at) \
+                VALUES (%s, %s)
             """
+            cursor.execute(query, (story['title'], execution_date))
+            conn.commit()
 
-        for story_info in stories_generator:
-            pass
+        cursor.close()
+        conn.close()
 
     @task()
     def save_data(**context):
@@ -127,13 +134,13 @@ def hacker_news():
 
     task4 = save_stories_data_vault()
 
-    # task1 = fetch_story_ids()
+    task1 = fetch_story_ids()
 
-    # task2 = process_stories_ids()
+    task2 = process_stories_ids()
 
     # task3 = save_data()
 
-    # task1 >> task2 >> task3     # type: ignore
+    task1 >> task2 >> task4    # type: ignore
 
 
 dag = hacker_news()
