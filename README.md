@@ -1,6 +1,6 @@
 # Hacker News fetcher
 
-Service saves every one hour top 10 best stories from Hacker News site.
+Service saves every one hour top 150 best stories from Hacker News site.
 
 For convenience [API of Hacker News](https://github.com/HackerNews/API) was used.
 
@@ -34,8 +34,8 @@ AIRFLOW_FERNET_KEY=
 AIRFLOW_DAGS_ARE_PAUSED_AT_CREATION=True
 AIRFLOW_LOAD_EXAMPLES=False
 
-AIRFLOW_DAGS_PATH=./dags  # path to dags in local machine
-AIRFLOW_LOGS_PATH=./logs  # path to logs in local machine
+AIRFLOW_DAGS_PATH=./app/dags  # path to dags in local machine
+AIRFLOW_LOGS_PATH=./app/logs  # path to logs in local machine
 AIRFLOW_USER=airflow  # airflow user
 AIRFLOW_PASSWORD=airflow  # airflow user's password
 
@@ -43,10 +43,12 @@ AIRFLOW_PASSWORD=airflow  # airflow user's password
 POSTGRES_USER=airflow
 POSTGRES_PASSWORD=airflow
 POSTGRES_DB=airflow
-
+POSTGRES_HN_DB=hackernews # database for save articles data
+POSTGRES_HN_USER=hackernews # user for articles database management
+POSTGRES_HN_PASSWORD=hackernews # user's password for articles database management
 ```
 
-## Create connection in airflow
+## Create connection in airflow to S3 storage (minio)
 Fill **fields**
 
 `Conn id`: `MINIO_CONN_NAME`
@@ -58,8 +60,8 @@ Fill **fields**
 `Extra`: 
 ```
 {
-  "aws_access_key_id": MINIO_USER, 
-  "aws_secret_access_key": MINIO_PASSWORD, 
+  "aws_access_key_id": "MINIO_USER", 
+  "aws_secret_access_key": "MINIO_PASSWORD", 
   "host": "http://minio:9000"
 }
 ```
