@@ -48,7 +48,7 @@ POSTGRES_HN_USER=hackernews # user for articles database management
 POSTGRES_HN_PASSWORD=hackernews # user's password for articles database management
 ```
 
-## Create connection in airflow
+## Create connection in airflow to S3 storage (minio)
 Fill **fields**
 
 `Conn id`: `MINIO_CONN_NAME`
