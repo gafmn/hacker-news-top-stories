@@ -12,8 +12,8 @@ from src.api_service import (   # type: ignore
     fetch_story_data
 )
 from src.parse_data import build_stories_info   # type: ignore
-from src.db_connector import establish_connection
-from src.utils import hash_string
+from src.db_connector import establish_connection   # type: ignore
+from src.utils import hash_string   # type: ignore
 
 
 logger = logging.getLogger('airflow.task')

@@ -1,7 +1,7 @@
 import os
 
-import psycopg2
-from psycopg2.extensions import connection
+import psycopg2     # type: ignore
+from psycopg2.extensions import connection  # type: ignore
 
 
 def establish_connection() -> connection:
