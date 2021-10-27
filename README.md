@@ -34,8 +34,8 @@ AIRFLOW_FERNET_KEY=
 AIRFLOW_DAGS_ARE_PAUSED_AT_CREATION=True
 AIRFLOW_LOAD_EXAMPLES=False
 
-AIRFLOW_DAGS_PATH=./dags  # path to dags in local machine
-AIRFLOW_LOGS_PATH=./logs  # path to logs in local machine
+AIRFLOW_DAGS_PATH=./app/dags  # path to dags in local machine
+AIRFLOW_LOGS_PATH=./app/logs  # path to logs in local machine
 AIRFLOW_USER=airflow  # airflow user
 AIRFLOW_PASSWORD=airflow  # airflow user's password
 
