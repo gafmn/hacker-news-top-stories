@@ -87,19 +87,24 @@ def hacker_news():
         cursor = conn.cursor()
 
         for story in stories_generator:
-            query_h_articles = """
-                INSERT INTO h_articles (hash, created_at) \
-                VALUES (%s, %s)
-            """
-            query_satellite = """
-                INSERT INTO hsat_article_descriptions \
-                (hash, article_hash, name, link, rating) \
-                VALUES (%s, %s, %s, %s, %s)
-            """
+
             hash_article = hash_string(story['title'])
 
             link = story.get('url', 'there is no link')
             hash_sat = hash_string(link+story['title'])
+
+            query_h_articles = """
+                INSERT INTO h_articles (hash, created_at) \
+                VALUES (%s, %s) ON CONFLICT (hash) DO UPDATE \
+                SET created_at = excluded.created_at
+            """
+            query_satellite = """
+                INSERT INTO hsat_article_descriptions \
+                (hash, article_hash, name, link, rating) \
+                VALUES (%s, %s, %s, %s, %s) ON CONFLICT (hash) DO UPDATE \
+                SET link = excluded.link,
+                rating = excluded.rating
+            """
 
             cursor.execute(query_h_articles, (hash_article, execution_date))
             cursor.execute(
@@ -112,7 +117,7 @@ def hacker_news():
         conn.close()
 
     @task()
-    def save_data(**context):
+    def save_stories_s3(**context):
         """
         Save processed data to storage server
         """
@@ -147,15 +152,15 @@ def hacker_news():
         )
         logger.info('Data was successfully loaded')
 
-    task4 = save_stories_data_vault()
-
     task1 = fetch_story_ids()
 
     task2 = process_stories_ids()
 
-    # task3 = save_data()
+    task3 = save_stories_s3()
 
-    task1 >> task2 >> task4    # type: ignore
+    task4 = save_stories_data_vault()
+
+    task1 >> task2 >> [task3, task4]   # type: ignore
 
 
 dag = hacker_news()
