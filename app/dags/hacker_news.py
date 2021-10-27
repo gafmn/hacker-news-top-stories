@@ -13,6 +13,7 @@ from src.api_service import (   # type: ignore
 )
 from src.parse_data import build_stories_info   # type: ignore
 from src.db_connector import establish_connection
+from src.utils import hash_string
 
 
 logger = logging.getLogger('airflow.task')
@@ -86,11 +87,25 @@ def hacker_news():
         cursor = conn.cursor()
 
         for story in stories_generator:
-            query = """
-                INSERT INTO h_articles (name, created_at) \
+            query_h_articles = """
+                INSERT INTO h_articles (hash, created_at) \
                 VALUES (%s, %s)
             """
-            cursor.execute(query, (story['title'], execution_date))
+            query_satellite = """
+                INSERT INTO hsat_article_descriptions \
+                (hash, article_hash, name, link, rating) \
+                VALUES (%s, %s, %s, %s, %s)
+            """
+            hash_article = hash_string(story['title'])
+
+            link = story.get('url', 'there is no link')
+            hash_sat = hash_string(link+story['title'])
+
+            cursor.execute(query_h_articles, (hash_article, execution_date))
+            cursor.execute(
+                query_satellite,
+                (hash_sat, hash_article, story['title'], link, story['score'])
+            )
             conn.commit()
 
         cursor.close()

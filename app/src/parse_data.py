@@ -27,6 +27,6 @@ def build_stories_info(
         story['link'] = item.get('url', 'there is no link')
         stories_info['articles'].append(story)
 
-    result =  json.dumps(stories_info, default=str)
+    result = json.dumps(stories_info, default=str)
 
     return result
