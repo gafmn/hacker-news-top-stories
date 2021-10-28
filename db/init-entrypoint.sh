@@ -9,20 +9,18 @@ EOSQL
 
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_HN_USER" --dbname "$POSTGRES_HN_DB" <<-EOSQL
     CREATE TABLE h_articles (
-      hash INT,
-      created_at varchar(20) NOT NULL,
-      PRIMARY KEY(hash)
+      article_name varchar(300),
+      name_hashed_key INT,
+      load_ts varchar(20) NOT NULL,
+      PRIMARY KEY(name_hashed_key)
     );
     
     CREATE TABLE hsat_article_descriptions (
-      hash INT,
-      article_hash INT,
-      name varchar(300),
-      link varchar(300),
-      rating INT,
-      PRIMARY KEY(hash),
+      hkey_article INT,
+      score INT,
+      url varchar(300),
       CONSTRAINT fk_article
-        FOREIGN KEY(article_hash)
-          REFERENCES h_articles(hash)
+        FOREIGN KEY(hkey_article)
+          REFERENCES h_articles(name_hashed_key)
     );
 EOSQL

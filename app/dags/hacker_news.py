@@ -87,29 +87,34 @@ def hacker_news():
         cursor = conn.cursor()
 
         for story in stories_generator:
+            logger.info(f"Try to save {story['title']} with {story['id']}")
 
-            hash_article = hash_string(story['title'])
+            name_hashed_key = hash_string(
+                f"{story['title']}{execution_date}{str(story['id'])}"
+            )
+            link = story.get('url', 'there is no url')
 
-            link = story.get('url', 'there is no link')
-            hash_sat = hash_string(link+story['title'])
+            logger.info(f"With this hash {name_hashed_key}")
+            logger.info(f"With this time stamp {execution_date}")
 
             query_h_articles = """
-                INSERT INTO h_articles (hash, created_at) \
-                VALUES (%s, %s) ON CONFLICT (hash) DO UPDATE \
-                SET created_at = excluded.created_at
+                INSERT INTO h_articles \
+                (article_name, name_hashed_key, load_ts) \
+                VALUES (%s, %s, %s)
             """
             query_satellite = """
                 INSERT INTO hsat_article_descriptions \
-                (hash, article_hash, name, link, rating) \
-                VALUES (%s, %s, %s, %s, %s) ON CONFLICT (hash) DO UPDATE \
-                SET link = excluded.link,
-                rating = excluded.rating
+                (hkey_article, score, url) \
+                VALUES (%s, %s, %s)
             """
 
-            cursor.execute(query_h_articles, (hash_article, execution_date))
+            cursor.execute(
+                query_h_articles,
+                (story['title'], name_hashed_key, execution_date)
+            )
             cursor.execute(
                 query_satellite,
-                (hash_sat, hash_article, story['title'], link, story['score'])
+                (name_hashed_key, story['score'], link)
             )
             conn.commit()
 
