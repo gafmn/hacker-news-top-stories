@@ -65,6 +65,9 @@ Fill **fields**
   "host": "http://minio:9000"
 }
 ```
+## Database schema for articles
+
+![Use hashes as primary key](https://github.com/gafmn/hacker-news-top-stories/blob/feature/data-vault/imgs/hacker-news%20db%20desc.jpg)
 
 ## How to run project
 
